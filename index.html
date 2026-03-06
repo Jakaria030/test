@@ -1,14 +1,1087 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Project</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrapesJS React Editor</title>
+
+  <!-- GrapesJS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.21.7/css/grapes.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.21.7/grapes.min.js"></script>
+
+  <!-- React & Babel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & TOKENS ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f13;
+      --bg2:       #14161c;
+      --bg3:       #1c1f28;
+      --border:    #2a2d3a;
+      --accent:    #5b6cff;
+      --accent2:   #ff5b8d;
+      --text:      #e4e6f0;
+      --text2:     #7c8099;
+      --text3:     #4a4e65;
+      --radius:    8px;
+      --sidebar-w: 260px;
+      --topbar-h:  52px;
+      --font-ui:   'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --transition: 0.28s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body, #root {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────── */
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      height: var(--topbar-h);
+      min-height: var(--topbar-h);
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      z-index: 100;
+      user-select: none;
+    }
+
+    .topbar-logo {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+
+    .topbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .topbar-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text2);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .topbar-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .topbar-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .topbar-btn.danger:hover {
+      background: #ff3b5c;
+      border-color: #ff3b5c;
+      color: #fff;
+    }
+
+    .topbar-spacer { flex: 1; }
+
+    .topbar-device-group {
+      display: flex;
+      gap: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3px;
+    }
+    .device-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all var(--transition);
+    }
+    .device-btn:hover { color: var(--text); background: var(--border); }
+    .device-btn.active { background: var(--accent); color: #fff; }
+
+    .topbar-zoom {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text2);
+      font-family: var(--font-mono);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px 10px;
+    }
+    .topbar-zoom button {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      padding: 0 2px;
+      transition: color var(--transition);
+    }
+    .topbar-zoom button:hover { color: var(--text); }
+
+    /* BODY ROW */
+    .body-row {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* SIDEBARS */
+    .sidebar {
+      height: 100%;
+      background: var(--bg2);
+      border-color: var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width var(--transition), min-width var(--transition);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .sidebar.left  {
+      border-right: 1px solid var(--border);
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+    }
+    .sidebar.right {
+      border-left: 1px solid var(--border);
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+    }
+    .sidebar.collapsed {
+      width: 38px !important;
+      min-width: 38px !important;
+    }
+    .sidebar-content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      position: absolute;
+      z-index: 10;
+      width: 22px;
+      height: 44px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      font-size: 12px;
+      transition: all var(--transition);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .sidebar.left .sidebar-toggle {
+      right: -22px;
+      border-left: none;
+    }
+    .sidebar.right .sidebar-toggle {
+      left: -22px;
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+    }
+    .sidebar-toggle:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Sidebar collapsed icon strip */
+    .sidebar-icon-strip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 0;
+    }
+    .sidebar.left .sidebar-icon-strip { border-right: none; }
+    .strip-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .strip-icon:hover { background: var(--accent); color: #fff; }
+
+    /* Sidebar tabs */
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sidebar-tab {
+      flex: 1;
+      padding: 10px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text3);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: var(--font-ui);
+      transition: all var(--transition);
+      border-bottom: 2px solid transparent;
+    }
+    .sidebar-tab:hover { color: var(--text2); }
+    .sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Sidebar panel */
+    .sidebar-panel {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .sidebar-panel::-webkit-scrollbar { width: 4px; }
+    .sidebar-panel::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Section headers */
+    .section-header {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding: 8px 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Block grid */
+    .blocks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px 0;
+    }
+    .block-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 8px;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      transition: all var(--transition);
+      font-size: 11px;
+      color: var(--text2);
+      text-align: center;
+      font-weight: 600;
+      user-select: none;
+    }
+    .block-item:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(91,108,255,0.08);
+      transform: translateY(-1px);
+    }
+    .block-item:active { cursor: grabbing; transform: scale(0.96); }
+    .block-icon { font-size: 20px; }
+
+    /* Layer tree */
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .layer-item:hover { background: var(--bg3); color: var(--text); }
+    .layer-item.active { background: rgba(91,108,255,0.12); color: var(--accent); }
+    .layer-dot {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Property rows */
+    .prop-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 4px;
+      margin-bottom: 2px;
+    }
+    .prop-label {
+      font-size: 11px;
+      color: var(--text2);
+      width: 72px;
+      flex-shrink: 0;
+    }
+    .prop-input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      outline: none;
+      transition: border-color var(--transition);
+      width: 100%;
+    }
+    .prop-input:focus { border-color: var(--accent); }
+
+    .prop-color-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 4px;
+    }
+    .color-swatch {
+      width: 28px; height: 28px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Spacing widget */
+    .spacing-widget {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 3px;
+      padding: 6px 0;
+    }
+    .spacing-input-wrap {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text2);
+      font-family: var(--font-mono);
+      padding: 4px;
+      cursor: text;
+      transition: border-color var(--transition);
+    }
+    .spacing-input-wrap:hover { border-color: var(--accent); }
+    .spacing-center {
+      background: var(--bg3);
+      border: 1px dashed var(--border);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    /* CANVAS */
+    .canvas-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      overflow: hidden;
+      position: relative;
+    }
+    .canvas-ruler-h {
+      height: 20px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    .ruler-marks {
+      display: flex;
+      gap: 0;
+      font-size: 9px;
+      color: var(--text3);
+      font-family: var(--font-mono);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ruler-mark { width: 40px; flex-shrink: 0; text-align: left; }
+
+    .canvas-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: 28px;
+      position: relative;
+    }
+    .canvas-frame {
+      background: #ffffff;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px var(--border), 0 24px 80px rgba(0,0,0,0.5);
+      overflow: hidden;
+      transition: width var(--transition), height var(--transition);
+      position: relative;
+    }
+
+    /* GrapesJS canvas override - kill default UI chrome */
+    #gjs { width: 100%; height: 100%; }
+    #gjs .gjs-toolbar,
+    #gjs .gjs-resizer,
+    #gjs .gjs-badge { display: none !important; }
+
+    .gjs-cv-canvas {
+      top: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .gjs-frame-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Status bar */
+    .statusbar {
+      height: 24px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+      font-size: 10px;
+      color: var(--text3);
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #3ddc84;
+    }
+
+    /* Tooltip */
+    [data-tip] { position: relative; }
+    [data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11px;
+      white-space: nowrap;
+      padding: 4px 8px;
+      border-radius: 5px;
+      pointer-events: none;
+      z-index: 999;
+      font-family: var(--font-ui);
+    }
+
+    /* Scrollbar global */
+    * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+    /* Smooth fade for panel switch */
+    .panel-fade-enter { opacity: 0; transform: translateY(4px); }
+    .panel-fade { transition: opacity 0.18s ease, transform 0.18s ease; }
+  </style>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <h2>Hello Earth</h2>
-    <h3>Hello Nation</h3>
-    <h4>H4 tag added</h4>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    /* ─── DATA ─────────────────────────────────────────────── */
+    const BLOCKS = [
+      { id: 'section',    icon: '▬', label: 'Section',   content: '<section style="padding:40px 20px;min-height:100px;background:#f8f9fa"></section>' },
+      { id: 'text',       icon: '𝐓', label: 'Text',      content: '<p style="padding:8px;font-size:16px">Edit this text</p>' },
+      { id: 'heading',    icon: 'H', label: 'Heading',   content: '<h2 style="padding:8px;font-size:28px;font-weight:700">Heading</h2>' },
+      { id: 'image',      icon: '🖼', label: 'Image',     content: '<img src="https://via.placeholder.com/300x200" style="max-width:100%;display:block" />' },
+      { id: 'button',     icon: '⬛', label: 'Button',    content: '<a href="#" style="display:inline-block;padding:10px 24px;background:#5b6cff;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">Button</a>' },
+      { id: 'columns2',   icon: '⫿', label: '2 Columns', content: '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div style="padding:20px;background:#e9ecef;border-radius:4px">Col 1</div><div style="padding:20px;background:#e9ecef;border-radius:4px">Col 2</div></div>' },
+      { id: 'columns3',   icon: '⫾', label: '3 Columns', content: '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px"><div style="padding:16px;background:#e9ecef;border-radius:4px">Col 1</div><div style="padding:16px;background:#e9ecef;border-radius:4px">Col 2</div><div style="padding:16px;background:#e9ecef;border-radius:4px">Col 3</div></div>' },
+      { id: 'divider',    icon: '─', label: 'Divider',   content: '<hr style="border:none;border-top:2px solid #dee2e6;margin:20px 0" />' },
+      { id: 'video',      icon: '▶', label: 'Video',     content: '<div style="padding:20px;background:#000;color:#fff;text-align:center;border-radius:4px">▶ Video Embed</div>' },
+      { id: 'form',       icon: '✎', label: 'Form',      content: '<form style="padding:16px"><input type="text" placeholder="Your name" style="display:block;width:100%;padding:8px 12px;margin-bottom:10px;border:1px solid #dee2e6;border-radius:4px" /><input type="email" placeholder="Email" style="display:block;width:100%;padding:8px 12px;margin-bottom:10px;border:1px solid #dee2e6;border-radius:4px" /><button type="submit" style="padding:10px 24px;background:#5b6cff;color:#fff;border:none;border-radius:4px;cursor:pointer">Submit</button></form>' },
+    ];
+
+    const LAYERS = [
+      { id: 'body', label: 'Body', color: '#5b6cff', depth: 0 },
+      { id: 's1',   label: 'Section',  color: '#ff5b8d', depth: 1 },
+      { id: 'h1',   label: 'Heading',  color: '#ffd15b', depth: 2 },
+      { id: 'p1',   label: 'Paragraph',color: '#3ddc84', depth: 2 },
+      { id: 'b1',   label: 'Button',   color: '#5b6cff', depth: 2 },
+    ];
+
+    const DEVICES = [
+      { id: 'desktop', icon: '🖥', label: 'Desktop', w: '100%',  h: '100%' },
+      { id: 'tablet',  icon: '📱', label: 'Tablet',  w: '768px', h: '600px' },
+      { id: 'mobile',  icon: '📲', label: 'Mobile',  w: '390px', h: '650px' },
+    ];
+
+    /* ─── SUB COMPONENTS ───────────────────────────────────── */
+    function TopBar({ device, setDevice, zoom, setZoom, onUndo, onRedo, onPreview, onExport, leftCollapsed, rightCollapsed, setLeftCollapsed, setRightCollapsed }) {
+      return (
+        <div className="topbar">
+          <span className="topbar-logo">✦ Compose</span>
+          <div className="topbar-divider" />
+
+          {/* Sidebar toggles */}
+          <button className="topbar-btn" data-tip="Left Sidebar" onClick={() => setLeftCollapsed(v => !v)}>
+            {leftCollapsed ? '⇥' : '⇤'} <span>{leftCollapsed ? 'Panels' : 'Hide'}</span>
+          </button>
+
+          <div className="topbar-divider" />
+
+          {/* History */}
+          <button className="topbar-btn" data-tip="Undo" onClick={onUndo}>↩ Undo</button>
+          <button className="topbar-btn" data-tip="Redo" onClick={onRedo}>↪ Redo</button>
+
+          <div className="topbar-divider" />
+
+          {/* Devices */}
+          <div className="topbar-device-group">
+            {DEVICES.map(d => (
+              <button key={d.id} className={`device-btn${device === d.id ? ' active' : ''}`} title={d.label} onClick={() => setDevice(d.id)}>
+                {d.icon}
+              </button>
+            ))}
+          </div>
+
+          {/* Zoom */}
+          <div className="topbar-zoom">
+            <button onClick={() => setZoom(z => Math.max(25, z - 25))}>−</button>
+            <span>{zoom}%</span>
+            <button onClick={() => setZoom(z => Math.min(200, z + 25))}>+</button>
+          </div>
+
+          <div className="topbar-spacer" />
+
+          <button className="topbar-btn" onClick={onPreview}>👁 Preview</button>
+          <button className="topbar-btn active" onClick={onExport}>⬇ Export</button>
+
+          <div className="topbar-divider" />
+
+          <button className="topbar-btn" data-tip="Right Sidebar" onClick={() => setRightCollapsed(v => !v)}>
+            {rightCollapsed ? '⇤' : '⇥'} <span>{rightCollapsed ? 'Props' : 'Hide'}</span>
+          </button>
+        </div>
+      );
+    }
+
+    function LeftSidebar({ collapsed, setCollapsed, editorRef }) {
+      const [tab, setTab] = useState('blocks');
+
+      const handleDragStart = (block) => {
+        if (!editorRef.current) return;
+        // GrapesJS block manager drag
+      };
+
+      const handleBlockClick = (block) => {
+        if (!editorRef.current) return;
+        const editor = editorRef.current;
+        const sel = editor.getSelected();
+        if (sel) {
+          sel.append(block.content);
+        } else {
+          editor.getWrapper().append(block.content);
+        }
+      };
+
+      return (
+        <div className={`sidebar left${collapsed ? ' collapsed' : ''}`}>
+          <button className="sidebar-toggle" onClick={() => setCollapsed(v => !v)}>
+            {collapsed ? '›' : '‹'}
+          </button>
+
+          {collapsed ? (
+            <div className="sidebar-icon-strip">
+              {['⊞','☰','◫'].map((ic, i) => (
+                <div key={i} className="strip-icon" onClick={() => setCollapsed(false)}>{ic}</div>
+              ))}
+            </div>
+          ) : (
+            <div className="sidebar-content">
+              <div className="sidebar-tabs">
+                {[['blocks','⊞ Blocks'],['layers','☰ Layers']].map(([id, label]) => (
+                  <button key={id} className={`sidebar-tab${tab === id ? ' active' : ''}`} onClick={() => setTab(id)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="sidebar-panel">
+                {tab === 'blocks' && (
+                  <>
+                    <div className="section-header">Elements</div>
+                    <div className="blocks-grid">
+                      {BLOCKS.map(b => (
+                        <div
+                          key={b.id}
+                          className="block-item"
+                          draggable
+                          onClick={() => handleBlockClick(b)}
+                          title={`Add ${b.label}`}
+                        >
+                          <span className="block-icon">{b.icon}</span>
+                          <span>{b.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {tab === 'layers' && (
+                  <>
+                    <div className="section-header">Tree</div>
+                    {LAYERS.map(l => (
+                      <div key={l.id} className="layer-item" style={{ paddingLeft: 8 + l.depth * 14 }}>
+                        <span className="layer-dot" style={{ background: l.color }} />
+                        <span>{l.label}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function RightSidebar({ collapsed, setCollapsed, selectedInfo }) {
+      const [tab, setTab] = useState('style');
+
+      return (
+        <div className={`sidebar right${collapsed ? ' collapsed' : ''}`}>
+          <button className="sidebar-toggle" onClick={() => setCollapsed(v => !v)}>
+            {collapsed ? '‹' : '›'}
+          </button>
+
+          {collapsed ? (
+            <div className="sidebar-icon-strip">
+              {['✦','⊡','☁'].map((ic, i) => (
+                <div key={i} className="strip-icon" onClick={() => setCollapsed(false)}>{ic}</div>
+              ))}
+            </div>
+          ) : (
+            <div className="sidebar-content">
+              <div className="sidebar-tabs">
+                {[['style','Style'],['props','Props'],['css','CSS']].map(([id, label]) => (
+                  <button key={id} className={`sidebar-tab${tab === id ? ' active' : ''}`} onClick={() => setTab(id)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="sidebar-panel">
+                {/* Selected element info */}
+                {selectedInfo && (
+                  <div style={{ padding: '6px 4px 10px', borderBottom: '1px solid var(--border)', marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 3 }}>Selected</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>{selectedInfo}</div>
+                  </div>
+                )}
+
+                {tab === 'style' && (
+                  <>
+                    <div className="section-header">Layout</div>
+                    <div className="prop-row">
+                      <span className="prop-label">Display</span>
+                      <input className="prop-input" defaultValue="block" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Width</span>
+                      <input className="prop-input" defaultValue="100%" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Height</span>
+                      <input className="prop-input" defaultValue="auto" />
+                    </div>
+
+                    <div className="section-header">Spacing</div>
+                    <div className="spacing-widget">
+                      <div></div>
+                      <div className="spacing-input-wrap">top</div>
+                      <div></div>
+                      <div className="spacing-input-wrap">left</div>
+                      <div className="spacing-center">Box</div>
+                      <div className="spacing-input-wrap">right</div>
+                      <div></div>
+                      <div className="spacing-input-wrap">btm</div>
+                      <div></div>
+                    </div>
+
+                    <div className="section-header">Typography</div>
+                    <div className="prop-row">
+                      <span className="prop-label">Font</span>
+                      <input className="prop-input" defaultValue="inherit" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Size</span>
+                      <input className="prop-input" defaultValue="16px" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Weight</span>
+                      <input className="prop-input" defaultValue="400" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Color</span>
+                      <div className="prop-color-row" style={{flex:1,padding:0}}>
+                        <div className="color-swatch" style={{background:'#333333'}} />
+                        <input className="prop-input" defaultValue="#333333" />
+                      </div>
+                    </div>
+
+                    <div className="section-header">Background</div>
+                    <div className="prop-row">
+                      <span className="prop-label">Fill</span>
+                      <div className="prop-color-row" style={{flex:1,padding:0}}>
+                        <div className="color-swatch" style={{background:'#ffffff'}} />
+                        <input className="prop-input" defaultValue="#ffffff" />
+                      </div>
+                    </div>
+
+                    <div className="section-header">Border</div>
+                    <div className="prop-row">
+                      <span className="prop-label">Radius</span>
+                      <input className="prop-input" defaultValue="0px" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Width</span>
+                      <input className="prop-input" defaultValue="0px" />
+                    </div>
+                  </>
+                )}
+
+                {tab === 'props' && (
+                  <>
+                    <div className="section-header">Attributes</div>
+                    <div className="prop-row">
+                      <span className="prop-label">ID</span>
+                      <input className="prop-input" defaultValue="" placeholder="element-id" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Class</span>
+                      <input className="prop-input" defaultValue="" placeholder="class-name" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Tag</span>
+                      <input className="prop-input" defaultValue="div" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Href</span>
+                      <input className="prop-input" defaultValue="" placeholder="https://" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Alt</span>
+                      <input className="prop-input" defaultValue="" placeholder="Alt text" />
+                    </div>
+
+                    <div className="section-header">Position</div>
+                    <div className="prop-row">
+                      <span className="prop-label">Type</span>
+                      <input className="prop-input" defaultValue="relative" />
+                    </div>
+                    <div className="prop-row">
+                      <span className="prop-label">Z-Index</span>
+                      <input className="prop-input" defaultValue="auto" />
+                    </div>
+                  </>
+                )}
+
+                {tab === 'css' && (
+                  <>
+                    <div className="section-header">Raw CSS</div>
+                    <textarea
+                      className="prop-input"
+                      style={{
+                        height: 220,
+                        resize: 'vertical',
+                        lineHeight: 1.6,
+                        fontSize: 12,
+                        fontFamily: 'var(--font-mono)',
+                        whiteSpace: 'pre',
+                      }}
+                      defaultValue={`.my-element {\n  /* styles here */\n  display: block;\n  padding: 0;\n  margin: 0;\n}`}
+                    />
+                    <div style={{ paddingTop: 8 }}>
+                      <button className="topbar-btn active" style={{ width: '100%', justifyContent: 'center' }}>
+                        Apply CSS
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function CanvasArea({ editorRef, device, zoom }) {
+      const containerRef = useRef(null);
+      const rulers = Array.from({ length: 20 }, (_, i) => i * 40);
+
+      useEffect(() => {
+        if (!containerRef.current) return;
+
+        // Destroy any prior instance
+        if (editorRef.current) {
+          try { editorRef.current.destroy(); } catch(e) {}
+        }
+
+        const editor = grapesjs.init({
+          container: '#gjs',
+          height: '100%',
+          width: '100%',
+          storageManager: false,
+          panels: { defaults: [] },   // no default panels
+          toolbar: [],
+          blockManager: { appendTo: null, blocks: [] },
+          styleManager: { appendTo: null, sectors: [] },
+          traitManager: { appendTo: null },
+          layerManager: { appendTo: null },
+          assetManager: { assets: [], upload: false },
+          deviceManager: {
+            devices: [
+              { name: 'Desktop', width: '' },
+              { name: 'Tablet',  width: '768px', widthMedia: '992px' },
+              { name: 'Mobile',  width: '390px', widthMedia: '480px' },
+            ],
+          },
+          canvas: {
+            styles: [
+              'https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap',
+            ],
+          },
+          components: `
+            <section style="padding:60px 40px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-align:center">
+              <h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Welcome to Compose</h1>
+              <p style="font-size:1.1rem;opacity:0.85;margin-bottom:32px">Drag blocks from the left panel · Click elements to style them · Export when ready.</p>
+              <a href="#" style="display:inline-block;padding:14px 32px;background:#fff;color:#667eea;border-radius:8px;font-weight:700;text-decoration:none">Get Started</a>
+            </section>
+            <section style="padding:50px 40px">
+              <h2 style="font-size:1.8rem;font-weight:700;margin-bottom:24px">Features</h2>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+                <div style="padding:24px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef">
+                  <div style="font-size:2rem;margin-bottom:12px">⚡</div>
+                  <h3 style="font-weight:700;margin-bottom:8px">Fast</h3>
+                  <p style="color:#6c757d;font-size:14px">Build pages in seconds with drag-and-drop blocks.</p>
+                </div>
+                <div style="padding:24px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef">
+                  <div style="font-size:2rem;margin-bottom:12px">🎨</div>
+                  <h3 style="font-weight:700;margin-bottom:8px">Beautiful</h3>
+                  <p style="color:#6c757d;font-size:14px">Pixel-perfect control over every element.</p>
+                </div>
+                <div style="padding:24px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef">
+                  <div style="font-size:2rem;margin-bottom:12px">📱</div>
+                  <h3 style="font-weight:700;margin-bottom:8px">Responsive</h3>
+                  <p style="color:#6c757d;font-size:14px">Preview across desktop, tablet and mobile.</p>
+                </div>
+              </div>
+            </section>
+          `,
+        });
+
+        editorRef.current = editor;
+
+        // Strip all default GrapesJS toolbar chrome
+        editor.on('load', () => {
+          const canvas = editor.Canvas;
+          // Remove GrapesJS default toolbar buttons that appear on selection
+          editor.on('component:selected', (component) => {
+            // keep selection visible but remove default toolbar
+          });
+        });
+
+      }, []);
+
+      // Device switching
+      useEffect(() => {
+        if (!editorRef.current) return;
+        const dm = editorRef.current.DeviceManager;
+        if (device === 'desktop') dm.select('Desktop');
+        else if (device === 'tablet')  dm.select('Tablet');
+        else if (device === 'mobile')  dm.select('Mobile');
+      }, [device]);
+
+      const devConfig = DEVICES.find(d => d.id === device);
+      const frameStyle = {
+        width:  device === 'desktop' ? '100%' : devConfig.w,
+        height: device === 'desktop' ? '100%' : devConfig.h,
+        transform: `scale(${zoom / 100})`,
+        transformOrigin: 'top center',
+      };
+
+      return (
+        <div className="canvas-area">
+          <div className="canvas-ruler-h">
+            <div className="ruler-marks">
+              {rulers.map(r => <span key={r} className="ruler-mark">{r}</span>)}
+            </div>
+          </div>
+
+          <div className="canvas-wrapper" ref={containerRef}>
+            <div className="canvas-frame" style={frameStyle}>
+              <div id="gjs" />
+            </div>
+          </div>
+
+          <div className="statusbar">
+            <div className="status-dot" />
+            <span>Ready</span>
+            <span>·</span>
+            <span>GrapesJS 0.21</span>
+            <span>·</span>
+            <span style={{ color: 'var(--text2)' }}>{device.charAt(0).toUpperCase() + device.slice(1)}</span>
+            <span>·</span>
+            <span>{zoom}% zoom</span>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── ROOT APP ─────────────────────────────────────────── */
+    function App() {
+      const [leftCollapsed,  setLeftCollapsed]  = useState(false);
+      const [rightCollapsed, setRightCollapsed] = useState(false);
+      const [device, setDevice] = useState('desktop');
+      const [zoom,   setZoom]   = useState(100);
+      const [selectedInfo, setSelectedInfo] = useState(null);
+      const editorRef = useRef(null);
+
+      const handleUndo    = () => editorRef.current?.UndoManager?.undo();
+      const handleRedo    = () => editorRef.current?.UndoManager?.redo();
+      const handlePreview = () => {
+        if (!editorRef.current) return;
+        const html = editorRef.current.getHtml();
+        const css  = editorRef.current.getCss();
+        const win  = window.open('', '_blank');
+        win.document.write(`<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}</body></html>`);
+        win.document.close();
+      };
+      const handleExport  = () => {
+        if (!editorRef.current) return;
+        const html = `<!DOCTYPE html>\n<html>\n<head>\n<style>\n${editorRef.current.getCss()}\n</style>\n</head>\n<body>\n${editorRef.current.getHtml()}\n</body>\n</html>`;
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'compose-export.html';
+        a.click();
+      };
+
+      // Listen for selection changes
+      useEffect(() => {
+        const interval = setInterval(() => {
+          if (editorRef.current) {
+            const sel = editorRef.current.getSelected();
+            setSelectedInfo(sel ? (sel.get('tagName') || sel.get('type') || 'Element') : null);
+            clearInterval(interval);
+            editorRef.current.on('component:selected', (c) => {
+              setSelectedInfo(c?.get('tagName')?.toUpperCase() || 'Element');
+            });
+            editorRef.current.on('component:deselected', () => setSelectedInfo(null));
+          }
+        }, 500);
+        return () => clearInterval(interval);
+      }, []);
+
+      return (
+        <div className="app">
+          <TopBar
+            device={device} setDevice={setDevice}
+            zoom={zoom} setZoom={setZoom}
+            onUndo={handleUndo} onRedo={handleRedo}
+            onPreview={handlePreview} onExport={handleExport}
+            leftCollapsed={leftCollapsed} rightCollapsed={rightCollapsed}
+            setLeftCollapsed={setLeftCollapsed} setRightCollapsed={setRightCollapsed}
+          />
+
+          <div className="body-row">
+            <LeftSidebar  collapsed={leftCollapsed}  setCollapsed={setLeftCollapsed}  editorRef={editorRef} />
+            <CanvasArea   editorRef={editorRef} device={device} zoom={zoom} />
+            <RightSidebar collapsed={rightCollapsed} setCollapsed={setRightCollapsed} selectedInfo={selectedInfo} />
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
