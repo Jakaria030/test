@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" width="200" height="64">
+  <defs>
+
+    <linearGradient id="inkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5A623"/>
+      <stop offset="45%" style="stop-color:#E8431A"/>
+      <stop offset="100%" style="stop-color:#C0392B"/>
+    </linearGradient>
+
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFECD2"/>
+      <stop offset="100%" style="stop-color:#FCB69F"/>
+    </linearGradient>
+
+    <linearGradient id="hexFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1C1008"/>
+      <stop offset="100%" style="stop-color:#2D1A0A"/>
+    </linearGradient>
+
+    <linearGradient id="wordGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#F5F0E8"/>
+      <stop offset="100%" style="stop-color:#C8B99A"/>
+    </linearGradient>
+
+    <filter id="warmGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="1 0.3 0 0 0.2
+                0 0.5 0 0 0.1
+                0 0 0.2 0 0
+                0 0 0 0.6 0" result="colorBlur"/>
+      <feMerge>
+        <feMergeNode in="colorBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="3" stdDeviation="2"
+                    flood-color="#F5A623" flood-opacity="0.25"/>
+    </filter>
+
+    <clipPath id="hexClip">
+      <polygon points="32,2 58,16 58,44 32,58 6,44 6,16"/>
+    </clipPath>
+
+  </defs>
+
+  <!-- ══════════════════════ -->
+  <!--     HEXAGON ICON      -->
+  <!-- ══════════════════════ -->
+
+  <!-- Outer hex -->
+  <polygon points="32,2 58,16 58,44 32,58 6,44 6,16"
+           fill="url(#hexFill)"
+           stroke="url(#inkGrad)"
+           stroke-width="1.8"
+           filter="url(#shadow)"/>
+
+  <!-- Inner hex ring -->
+  <polygon points="32,10 50,20 50,40 32,50 14,40 14,20"
+           fill="none"
+           stroke="rgba(245,166,35,0.18)"
+           stroke-width="1"/>
+
+  <!-- Brush sweep background -->
+  <path d="M 10 42 Q 22 28 32 30 Q 42 32 54 20"
+        stroke="url(#inkGrad)" stroke-width="8"
+        stroke-linecap="round" fill="none" opacity="0.12"
+        clip-path="url(#hexClip)"/>
+
+  <!-- J letter -->
+  <text x="13" y="42"
+        font-family="'Palatino Linotype', 'Palatino', 'Book Antiqua', serif"
+        font-size="26"
+        font-weight="700"
+        fill="url(#markGrad)"
+        filter="url(#warmGlow)"
+        letter-spacing="-1">J</text>
+
+  <!-- K letter -->
+  <text x="29" y="42"
+        font-family="'Palatino Linotype', 'Palatino', 'Book Antiqua', serif"
+        font-size="26"
+        font-weight="700"
+        fill="url(#inkGrad)"
+        filter="url(#warmGlow)"
+        letter-spacing="-1">K</text>
+
+  <!-- Accent dot top-right -->
+  <circle cx="53" cy="14" r="2.5" fill="#F5A623" opacity="0.9"/>
+  <circle cx="53" cy="14" r="4.5" fill="none"
+          stroke="#F5A623" stroke-width="0.8" opacity="0.3"/>
+
+  <!-- ══════════════════════ -->
+  <!--   VERTICAL SEPARATOR  -->
+  <!-- ══════════════════════ -->
+
+  <line x1="74" y1="12" x2="74" y2="52"
+        stroke="url(#inkGrad)" stroke-width="1"
+        opacity="0.5" stroke-dasharray="2 3"/>
+
+  <!-- ══════════════════════ -->
+  <!--       WORDMARK        -->
+  <!-- ══════════════════════ -->
+
+  <!-- Sub label -->
+  <text x="86" y="14"
+        font-family="'Courier New', 'Courier', monospace"
+        font-size="7"
+        font-weight="400"
+        fill="#8A7560"
+        letter-spacing="3.5">PAGE  BUILDER</text>
+
+  <!-- "Canvas" wordmark -->
+  <text x="84" y="46"
+        font-family="'Palatino Linotype', 'Palatino', 'Book Antiqua', serif"
+        font-size="32"
+        font-weight="400"
+        fill="url(#inkGrad)"
+        filter="url(#warmGlow)"
+        letter-spacing="-0.5">Canvas</text>
+
+  <!-- Underline brush stroke -->
+  <path d="M 85 52 Q 130 56 192 51"
+        stroke="url(#inkGrad)" stroke-width="1.5"
+        fill="none" opacity="0.45" stroke-linecap="round"/>
+
+</svg>
