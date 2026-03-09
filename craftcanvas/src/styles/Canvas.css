@@ -1,0 +1,140 @@
+/* ─── CANVAS AREA ─────────────────────────────────────
+   Outer container. flex column so ruler sits on top,
+   canvas fills middle, statusbar sits at bottom.
+─────────────────────────────────────────────────────── */
+.canvas-area {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;   /* stack ruler → canvas → statusbar */
+}
+
+/* ─── RULER ───────────────────────────────────────────
+   Thin bar across the top of the canvas.
+   Shows pixel markers as reference.
+─────────────────────────────────────────────────────── */
+.canvas-ruler {
+  height: 20px;
+  min-height: 20px;           /* never shrink */
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  flex-shrink: 0;             /* don't shrink in flex column */
+  overflow: hidden;
+}
+
+.ruler-marks {
+  display: flex;
+  width: 100%;
+}
+
+.ruler-mark {
+  width: 50px;                /* one mark every 50px */
+  font-size: 9px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ─── CANVAS WRAPPER ──────────────────────────────────
+   Scrollable area that holds the white canvas frame.
+   Centers the frame when device mode is tablet/mobile.
+─────────────────────────────────────────────────────── */
+.canvas-wrapper {
+  flex: 1;                    /* fills space between ruler and statusbar */
+  overflow: auto;             /* scroll if canvas frame is bigger */
+  display: flex;
+  align-items: flex-start;    /* frame starts from top */
+  justify-content: center;    /* frame centered horizontally */
+  padding: 24px;
+  background: var(--bg);
+}
+
+/* ─── CANVAS FRAME ────────────────────────────────────
+   The white box that represents the actual page.
+   GrapesJS iframe renders inside this.
+─────────────────────────────────────────────────────── */
+.canvas-frame {
+  background: #ffffff;
+  border-radius: 4px;
+  /* soft glow effect around the white frame */
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  position: relative;
+  transition:
+    width var(--transition),
+    height var(--transition);
+}
+
+/* ─── GRAPESJS OVERRIDES ──────────────────────────────
+   Remove all default GrapesJS UI chrome so we can
+   build our own panels and toolbars.
+─────────────────────────────────────────────────────── */
+
+/* Toolbar that appears above selected element */
+.gjs-toolbar {
+  display: none !important;
+}
+
+/* Badge showing element tag name on hover */
+.gjs-badge {
+  display: none !important;
+}
+
+/* Resize handles on selected element */
+.gjs-resizer {
+  display: none !important;
+}
+
+/* Make GrapesJS canvas fill our frame completely */
+.gjs-cv-canvas {
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ─── STATUS BAR ──────────────────────────────────────
+   Thin info bar at the very bottom of canvas area.
+   Shows editor state, device, zoom level.
+─────────────────────────────────────────────────────── */
+.statusbar {
+  height: 26px;
+  min-height: 26px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-family: var(--font-mono);    /* monospace for status text */
+  color: var(--text3);
+  user-select: none;
+}
+
+/* Green dot indicator */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3ddc84;              /* green = ready */
+  flex-shrink: 0;
+}
+
+/* Thin separator between status items */
+.status-sep {
+  color: var(--border);
+}
+
+/* Highlighted value in statusbar */
+.status-value {
+  color: var(--text2);
+}

@@ -1,0 +1,55 @@
+/* ─── BLOCKS GRID ─────────────────────────────────────
+   2 column grid layout for block items.
+─────────────────────────────────────────────────────── */
+.blocks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* 2 equal columns */
+  gap: 6px;
+  padding: 4px 0;
+}
+
+/* ─── BLOCK ITEM ──────────────────────────────────────
+   Each draggable block card in the grid.
+─────────────────────────────────────────────────────── */
+.block-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: grab;                 /* grab cursor shows it's draggable */
+  transition: all var(--transition);
+  user-select: none;            /* prevent text selection while dragging */
+}
+
+.block-item:hover {
+  border-color: var(--accent);
+  background: rgba(91, 108, 255, 0.08);   /* subtle purple tint */
+  transform: translateY(-2px);             /* slight lift on hover */
+}
+
+/* Shrink slightly when actively dragging */
+.block-item:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.block-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.block-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-align: center;
+}
+
+.block-item:hover .block-label {
+  color: var(--accent);      /* purple label on hover */
+}

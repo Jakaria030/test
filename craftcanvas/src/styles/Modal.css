@@ -1,0 +1,208 @@
+/* ─── OVERLAY ─────────────────────────────────────────
+   Dark background behind the modal.
+   Covers the entire screen.
+─────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;          /* stays in place when scrolling */
+  inset: 0;                 /* top:0 right:0 bottom:0 left:0 */
+  background: rgba(0, 0, 0, 0.7);   /* semi transparent black */
+  z-index: 1000;            /* above everything */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  /* Fade in animation */
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── MODAL BOX ───────────────────────────────────────
+   The actual modal container.
+─────────────────────────────────────────────────────── */
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;         /* never wider than 900px */
+  max-height: 85vh;         /* never taller than 85% of screen */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* Slide up animation */
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ─── MODAL HEADER ────────────────────────────────────
+   Top bar of the modal with title and close button.
+─────────────────────────────────────────────────────── */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;             /* never shrink */
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Colored dot next to title */
+.modal-title-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--accent2);   /* pink on hover */
+  border-color: var(--accent2);
+  color: #fff;
+}
+
+/* ─── MODAL TABS ──────────────────────────────────────
+   HTML and CSS tab switcher inside modal.
+─────────────────────────────────────────────────────── */
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-tab {
+  padding: 6px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.modal-tab:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.modal-tab.active {
+  background: var(--accent);   /* purple when active */
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ─── MODAL BODY ──────────────────────────────────────
+   Scrollable area that holds the code.
+─────────────────────────────────────────────────────── */
+.modal-body {
+  flex: 1;              /* fill remaining height */
+  overflow: auto;
+  padding: 0;
+  position: relative;
+}
+
+/* ─── CODE BLOCK ──────────────────────────────────────
+   Styled <pre> tag that shows formatted code.
+─────────────────────────────────────────────────────── */
+.code-block {
+  margin: 0;
+  padding: 20px;
+  font-family: var(--font-mono);    /* monospace font */
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg);            /* darkest background */
+  min-height: 100%;
+  white-space: pre;                 /* preserve indentation */
+  overflow-x: auto;                 /* horizontal scroll for long lines */
+  tab-size: 2;
+}
+
+/* ─── COPY BUTTON ─────────────────────────────────────
+   Floating button in top-right of code area.
+─────────────────────────────────────────────────────── */
+.copy-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text2);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ─── MODAL FOOTER ────────────────────────────────────
+   Bottom bar with stats about the code.
+─────────────────────────────────────────────────────── */
+.modal-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+}
+
+.footer-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.footer-stat-value {
+  color: var(--accent);   /* purple numbers */
+  font-weight: 700;
+}

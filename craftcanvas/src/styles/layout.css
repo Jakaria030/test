@@ -1,0 +1,102 @@
+/* ─── EDITOR WRAPPER ──────────────────────────────────
+   Root flex column container.
+   Topbar on top → body row fills remaining height.
+─────────────────────────────────────────────────────── */
+.editor-wrapper {
+  display: flex;
+  flex-direction: column;   /* vertical stack */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ─── TOPBAR ──────────────────────────────────────────
+   Fixed height bar. Never shrinks.
+─────────────────────────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);         /* exactly 52px */
+  min-height: var(--topbar-h);     /* never shrink */
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;             /* vertically center all children */
+  padding: 0 14px;
+  gap: 8px;                        /* space between all topbar items */
+  z-index: 100;
+  flex-shrink: 0;                  /* don't shrink in flex column */
+  user-select: none;               /* no text selection on click */
+}
+
+/* ─── EDITOR BODY ─────────────────────────────────────
+   Horizontal row below topbar.
+   Left sidebar | Canvas | Right sidebar
+─────────────────────────────────────────────────────── */
+.editor-body {
+  display: flex;         /* horizontal row */
+  flex: 1;              /* fills all height after topbar */
+  overflow: hidden;
+}
+
+/* ─── SIDEBARS ────────────────────────────────────────
+   Shared base styles for both sidebars.
+─────────────────────────────────────────────────────── */
+.sidebar {
+  height: 100%;
+  background: var(--bg2);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;                   /* never shrink */
+  overflow: hidden;
+  position: relative;               /* needed for toggle button positioning */
+  width: var(--sidebar-w);          /* 260px open */
+  min-width: var(--sidebar-w);
+  transition:                       /* animate open/close */
+    width var(--transition),
+    min-width var(--transition);
+}
+
+.sidebar.left-sidebar {
+  border-right: 1px solid var(--border);
+}
+
+.sidebar.right-sidebar {
+  border-left: 1px solid var(--border);
+}
+
+/* When collapsed → shrink to icon strip width */
+.sidebar.collapsed {
+  width: var(--sidebar-col) !important;      /* 38px */
+  min-width: var(--sidebar-col) !important;
+}
+
+/* Hide content when collapsed but keep it in DOM */
+.sidebar.collapsed .sidebar-content {
+  opacity: 0;              /* invisible */
+  pointer-events: none;    /* not clickable */
+}
+
+/* ─── SIDEBAR INNER CONTENT ───────────────────────────
+   Fills all space inside sidebar below toggle button.
+─────────────────────────────────────────────────────── */
+.sidebar-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: opacity var(--transition);
+}
+
+/* ─── CANVAS AREA ─────────────────────────────────────
+   Middle section between sidebars.
+   flex:1 means it takes all remaining width.
+─────────────────────────────────────────────────────── */
+.canvas-area {
+  flex: 1;               /* fill remaining space */
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}

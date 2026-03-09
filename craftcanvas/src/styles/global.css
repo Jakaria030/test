@@ -1,0 +1,88 @@
+/* ─── GOOGLE FONTS ────────────────────────────────────
+   Syne      → used for all UI text (bold, geometric)
+   DM Mono   → used for code, values, inputs
+   We load them from Google Fonts CDN.
+─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+/* ─── RESET ───────────────────────────────────────────
+   Remove all default browser margin, padding, sizing.
+─────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;   /* padding stays inside width */
+}
+
+/* ─── CSS VARIABLES ───────────────────────────────────
+   Single source of truth for all colors, sizes, fonts.
+   Change here → updates the entire app automatically.
+─────────────────────────────────────────────────────── */
+:root {
+  /* ── Backgrounds ── */
+  --bg:          #0e0f13;   /* darkest — main app bg */
+  --bg2:         #14161c;   /* dark — sidebar, topbar bg */
+  --bg3:         #1c1f28;   /* lighter dark — buttons, inputs */
+
+  /* ── Borders ── */
+  --border:      #2a2d3a;   /* all borders and dividers */
+
+  /* ── Accent colors ── */
+  --accent:      #5b6cff;   /* primary — purple blue */
+  --accent2:     #ff5b8d;   /* secondary — pink */
+
+  /* ── Text colors ── */
+  --text:        #e4e6f0;   /* primary text — almost white */
+  --text2:       #7c8099;   /* secondary text — muted */
+  --text3:       #4a4e65;   /* tertiary text — very muted */
+
+  /* ── Sizing ── */
+  --topbar-h:    52px;      /* topbar fixed height */
+  --sidebar-w:   260px;     /* sidebar open width */
+  --sidebar-col: 38px;      /* sidebar collapsed width */
+  --radius:      8px;       /* default border radius */
+
+  /* ── Typography ── */
+  --font-ui:     'Syne', sans-serif;      /* all UI labels, buttons */
+  --font-mono:   'DM Mono', monospace;    /* inputs, values, code */
+
+  /* ── Animation ── */
+  --transition:  0.28s cubic-bezier(.4, 0, .2, 1);  /* smooth ease */
+}
+
+/* ─── BASE STYLES ─────────────────────────────────────
+   Apply font and colors to the entire app.
+─────────────────────────────────────────────────────── */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;              /* no root scrollbars */
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);   /* Syne everywhere by default */
+}
+
+/* ─── SCROLLBAR ───────────────────────────────────────
+   Slim custom scrollbar for all scrollable elements.
+─────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;                          /* Firefox */
+  scrollbar-color: var(--border) transparent;     /* Firefox */
+}
+
+::-webkit-scrollbar {
+  width: 4px;            /* very thin */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);   /* purple on hover */
+}
