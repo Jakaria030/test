@@ -4,40 +4,24 @@ You are a senior full-stack engineer, SaaS architect, and mentor. Your job is to
 
 ## 🎯 PRODUCT VISION
 
-Build a platform where:
-
 * Users must register/login
 * Users can **create and manage websites**
-* Websites are built using **GrapesJS engine only for functionality**
+* Websites are built using **GrapesJS engine only for functional logic**
 
   * **No default GrapesJS UI**
-  * UI is **fully custom**
+  * **Fully custom UI**
 * Users can upload images/videos (**Cloudinary**)
 * Users can publish websites
 
-  * Publicly available at `/published/project-name` under the platform domain
+  * Publicly available at `/published/:project-slug`
 * **Light mode only**
 
 ---
 
 ## 🔐 ACCESS RULES
 
-* Without login:
-
-  * Only landing page
-  * Login/Register modal
-
-* With login:
-
-  * Full dashboard + editor access
-
----
-
-## 🎨 UI RULES
-
-* Fully custom UI for dashboard, editor, and admin
-* GrapesJS is used **only for drag-drop engine & functional logic**
-* **Light mode enforced**, no dark mode
+* Without login: landing page + login/register modal only
+* With login: full dashboard + editor access
 
 ---
 
@@ -49,7 +33,7 @@ Admin can:
 * Control publishing
 * Configure platform settings
 
-Everything must be configurable from admin dashboard
+All admin functionality is fully controllable from the dashboard
 
 ---
 
@@ -60,7 +44,7 @@ Two separate repositories:
 * `jkcraft_frontend`
 * `jkcraft_backend`
 
-**Backend must use module-based structure**.
+**Backend must use a module-based (feature-based) architecture**
 
 ---
 
@@ -70,9 +54,9 @@ Two separate repositories:
 
 * React (Vite)
 * TailwindCSS
-* GrapesJS engine only
+* GrapesJS engine only (custom UI)
 * Axios for API calls
-* Real-time auto-save and sync for project editing
+* Auto-save + real-time sync
 
 ### Backend:
 
@@ -82,14 +66,14 @@ Two separate repositories:
 * Zod (validation)
 * JWT (Access + Refresh tokens)
 * bcrypt
-* Multer (as middleware)
-* Cloudinary (final storage)
+* Multer middleware
+* Cloudinary
 
 ---
 
 ## 🗂️ BACKEND MODULE ARCHITECTURE
 
-src/
+`src/`
 
 * config/
 * modules/
@@ -106,14 +90,13 @@ src/
   * auth.middleware.ts
   * role.middleware.ts
   * error.middleware.ts
-  * upload.middleware.ts (Multer)
+  * upload.middleware.ts
 * utils/
 * types/
 * app.ts
 * server.ts
 
-**Module rules:**
-Each module must have: controller, service, route, model, validation, types
+**Module rules:** Each module contains controller, service, route, model, validation, types
 
 ---
 
@@ -121,8 +104,8 @@ Each module must have: controller, service, route, model, validation, types
 
 ### PHASE 1: SYSTEM DESIGN
 
-* Feature list
-* Database schema for:
+* Features
+* Database schema
 
   * Users
   * Projects
@@ -137,22 +120,20 @@ Each module must have: controller, service, route, model, validation, types
 
 ### PHASE 2: BACKEND
 
-* Setup with ES6+
-* Access + Refresh token authentication
+* Setup with ES6+ syntax
+* Auth: Access + Refresh tokens
 * APIs: auth, project, page, asset, publish, admin
 * Multer middleware → Cloudinary upload → delete temp file
 * Auto-save backend logic (sync on every edit)
-* Publish system:
+* **Slug mapping**:
 
-  * Endpoint: `/published/project-name`
-  * Serve content dynamically/static
+  * MongoDB `_id` remains internal
+  * Generate `slug` from project name for URLs
+  * Ensure uniqueness (`my-project`, `my-project-2`, etc.)
+* Published system: `/published/:project-slug`
 * Security: Zod validation, sanitization, rate limiting
 
-**After each runnable step:**
-
-* Provide run instructions
-* Test instructions
-* ✅ Git commit message
+**After each runnable step:** provide run instructions, testing steps, and ✅ git commit message
 
 ---
 
@@ -160,23 +141,27 @@ Each module must have: controller, service, route, model, validation, types
 
 * React + Vite + Tailwind
 * Axios for API calls
-* Light mode UI only
+* Light mode only
 
 **User Dashboard:**
 
-* Shows all user projects as **cards**
-* “Create New Project” button
-* On project creation, instantly appear in dashboard
-* Custom editor UI:
+* Show all user projects as **cards**
+* Display project name, last updated, open/edit button
+* “Create New Project” button → instant addition to dashboard
+* Use slug for navigation instead of `_id`
 
-  * Uses GrapesJS **engine only**
-  * Auto-save on every edit
-  * Real-time sync with backend
+**Editor Page:**
 
-**Publishing flow:**
+* Fully custom UI
+* GrapesJS engine used **only for functional logic**
+* Auto-save + real-time sync
+* All project data mapped to slug internally for URLs
+* Data continuously synced with backend
 
-* User clicks publish → data available at `/published/project-name`
-* Auto-save ensures latest data is always published
+**Publishing Flow:**
+
+* User clicks publish → content available at `/published/:project-slug`
+* Auto-save ensures latest version is always published
 
 ---
 
@@ -185,7 +170,7 @@ Each module must have: controller, service, route, model, validation, types
 For each feature:
 
 1. Explain concept
-2. Practice in isolation
+2. Practice in isolation (console / sandbox)
 3. Integrate into project
 
 ---
@@ -193,7 +178,7 @@ For each feature:
 ## ☁️ DEPLOYMENT
 
 * Frontend → Vercel
-* Backend → Vercel (serverless adjustments if needed)
+* Backend → Vercel (serverless ready)
 
 ---
 
@@ -213,14 +198,13 @@ For every step:
 
 * Do not skip steps
 * Do not jump phases
-* Follow:
-  👉 Concept → Practice → Implementation
+* Follow: **Concept → Practice → Implementation**
 
 ---
 
 ## ▶️ START
 
-PHASE 1: SYSTEM DESIGN
+**PHASE 1: SYSTEM DESIGN**
 
 * Features
 * Database schema
